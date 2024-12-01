@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestor de Tareas</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        line-height: 1.6;
+      }
+      textarea,
+      input {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 8px;
+        font-size: 16px;
+      }
+      button {
+        padding: 10px 15px;
+        margin-right: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      li {
+        margin-bottom: 10px;
+        padding: 10px;
+        background: #f0f0f0;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      li.completada {
+        text-decoration: line-through;
+        background: #d4edda;
+      }
+      .boton-eliminar {
+        background: red;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Gestor de Tareas</h1>
+    <label for="titulo">Título de la tarea:</label>
+    <input type="text" id="titulo" placeholder="Título de la tarea" />
+    <label for="descripcion">Descripción de la tarea:</label>
+    <textarea id="descripcion" placeholder="Descripción de la tarea"></textarea>
+    <button onclick="agregarTarea()">Agregar tarea</button>
+    <button onclick="limpiarTareas()">Limpiar todas las tareas</button>
+    <h2>Lista de tareas</h2>
+    <ul id="lista-tareas"></ul>
+
+    <script>
+      // Recuperar tareas del localStorage al cargar la página
+      document.addEventListener("DOMContentLoaded", mostrarTareas);
+
+      // Función para agregar una tarea
+      function agregarTarea() {
+        const titulo = document.getElementById("titulo").value.trim();
+        const descripcion = document.getElementById("descripcion").value.trim();
+
+        if (!titulo || !descripcion) {
+          alert("Por favor, completa todos los campos.");
+          return;
+        }
+
+        const nuevaTarea = {
+          titulo: titulo,
+          descripcion: descripcion,
+          completada: false,
+        };
+
+        const tareas = obtenerTareas();
+        tareas.push(nuevaTarea);
+        guardarTareas(tareas);
+
+        document.getElementById("titulo").value = "";
+        document.getElementById("descripcion").value = "";
+        mostrarTareas();
+      }
+
+      // Función para mostrar las tareas en la lista
+      function mostrarTareas() {
+        const listaTareas = document.getElementById("lista-tareas");
+        listaTareas.innerHTML = "";
+        const tareas = obtenerTareas();
+
+        tareas.forEach((tarea, index) => {
+          const li = document.createElement("li");
+          li.className = tarea.completada ? "completada" : "";
+          li.innerHTML = `
+                    <div>
+                        <strong>${tarea.titulo}</strong>: ${tarea.descripcion}
+                    </div>
+                    <div>
+                        <button onclick="toggleCompletada(${index})">
+                            ${tarea.completada ? "Desmarcar" : "Completar"}
+                        </button>
+                        <button class="boton-eliminar" onclick="eliminarTarea(${index})">Eliminar</button>
+                    </div>
+                `;
+          listaTareas.appendChild(li);
+        });
+      }
+
+      // Función para marcar o desmarcar una tarea como completada
+      function toggleCompletada(index) {
+        const tareas = obtenerTareas();
+        tareas[index].completada = !tareas[index].completada;
+        guardarTareas(tareas);
+        mostrarTareas();
+      }
+
+      // Función para eliminar una tarea específica
+      function eliminarTarea(index) {
+        if (confirm("¿Estás seguro de que deseas eliminar esta tarea?")) {
+          const tareas = obtenerTareas();
+          tareas.splice(index, 1);
+          guardarTareas(tareas);
+          mostrarTareas();
+        }
+      }
+
+      // Función para limpiar todas las tareas
+      function limpiarTareas() {
+        if (confirm("¿Estás seguro de que deseas limpiar todas las tareas?")) {
+          localStorage.removeItem("tareas");
+          mostrarTareas();
+        }
+      }
+
+      // Función para obtener las tareas desde localStorage
+      function obtenerTareas() {
+        const tareas = localStorage.getItem("tareas");
+        return tareas ? JSON.parse(tareas) : [];
+      }
+      // Función para guardar las tareas en localStorage
+      function guardarTareas(tareas) {
+        localStorage.setItem("tareas", JSON.stringify(tareas));
+      }
+    </script>
+  </body>
+</html>

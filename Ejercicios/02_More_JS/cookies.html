@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Cookies</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        // Función para establecer una cookie
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000)); // Establece la fecha de expiración
+            const expires = "expires=" + date.toUTCString();
+            document.cookie = `${name}=${encodeURIComponent(value)}; ${expires}; path=/`;
+        }
+
+        // Función para obtener el valor de una cookie por nombre
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i].trim(); // Elimina espacios en blanco
+                if (cookie.indexOf(nameEQ) === 0) {
+                    return decodeURIComponent(cookie.substring(nameEQ.length));
+                }
+            }
+            return null; // Si no encuentra la cookie
+        }
+
+        // Guardar las cookies con los valores del formulario
+        function guardarCookies() {
+            const nombre = document.getElementById('nombre').value;
+            const apellidos = document.getElementById('apellidos').value;
+
+            if (nombre && apellidos) {
+                setCookie('nombre', nombre, 7); // Guarda la cookie "nombre"
+                setCookie('apellidos', apellidos, 7); // Guarda la cookie "apellidos"
+                alert('¡Cookies guardadas correctamente!');
+            } else {
+                alert('Por favor, completa ambos campos antes de guardar.');
+            }
+        }
+
+        // Obtener las cookies y rellenar los campos
+        function obtenerCookies() {
+            const nombre = getCookie('nombre');
+            const apellidos = getCookie('apellidos');
+
+            if (nombre !== null && apellidos !== null) {
+                document.getElementById('nombre').value = nombre;
+                document.getElementById('apellidos').value = apellidos;
+                alert('¡Cookies cargadas correctamente!');
+            } else {
+                alert('No se encontraron cookies guardadas.');
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Gestión de Cookies</h1>
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" placeholder="Introduce tu nombre">
+    <label for="apellidos">Apellidos:</label>
+    <input type="text" id="apellidos" placeholder="Introduce tus apellidos">
+    <button onclick="guardarCookies()">Guardar cookies</button>
+    <button onclick="obtenerCookies()">Obtener cookies</button>
+</body>
+</html>
